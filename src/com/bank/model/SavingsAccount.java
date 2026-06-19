@@ -39,5 +39,13 @@ public class SavingsAccount extends Account {
         }
 
         deductBalance(amount);
+
+        recordTransaction(
+                new Transaction(
+                        Transaction.Type.WITHDRAW,
+                        amount,
+                        getAccountNumber(),
+                        null
+                )
+        );
     }
-}

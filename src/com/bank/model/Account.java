@@ -2,11 +2,17 @@ package com.bank.model;
 
 import com.bank.exception.InsufficientBalanceException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class Account {
 
     private final String accountNumber;
     protected BigDecimal balance;
+
+    // 🆕 Transaction history added
+    private final List<Transaction> transactions = new ArrayList<>();
 
     public Account(String accountNumber, BigDecimal initialBalance) {
 
@@ -22,8 +28,6 @@ public abstract class Account {
         this.balance = initialBalance;
     }
 
-    // ---------------- Core Getters ----------------
-
     public String getAccountNumber() {
         return accountNumber;
     }
@@ -32,22 +36,37 @@ public abstract class Account {
         return balance;
     }
 
-    // ---------------- Deposit ----------------
+    // ---------------- TRANSACTION ACCESS ----------------
+
+    public List<Transaction> getTransactions() {
+        return Collections.unmodifiableList(transactions);
+    }
+
+    // ---------------- DEPOSIT ----------------
 
     public final void deposit(BigDecimal amount) {
 
         validateAmount(amount);
 
         balance = balance.add(amount);
+
+        // 🆕 record transaction
+        recordTransaction(
+                new Transaction(
+                        Transaction.Type.DEPOSIT,
+                        amount,
+                        null,
+                        accountNumber
+                )
+        );
     }
 
-    // ---------------- Withdrawal (POLYMORPHIC) ----------------
+    // ---------------- WITHDRAW (POLYMORPHIC) ----------------
 
     public abstract void withdraw(BigDecimal amount)
             throws InsufficientBalanceException;
 
-    // ---------------- Protected Primitive Operation ----------------
-    // ONLY modifies state safely — no business rules
+    // ---------------- CORE BALANCE UPDATE ----------------
 
     protected final void deductBalance(BigDecimal amount) {
 
@@ -60,7 +79,13 @@ public abstract class Account {
         balance = balance.subtract(amount);
     }
 
-    // ---------------- Shared Validation ----------------
+    // ---------------- TRANSACTION RECORDING ----------------
+
+    protected final void recordTransaction(Transaction transaction) {
+        transactions.add(transaction);
+    }
+
+    // ---------------- VALIDATION ----------------
 
     protected void validateAmount(BigDecimal amount) {
 
@@ -71,15 +96,5 @@ public abstract class Account {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be greater than zero");
         }
-    }
-
-    // ---------------- Utility ----------------
-
-    @Override
-    public String toString() {
-        return "Account{" +
-                "accountNumber='" + accountNumber + '\'' +
-                ", balance=" + balance +
-                '}';
     }
 }
