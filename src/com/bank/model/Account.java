@@ -98,47 +98,6 @@ public abstract class Account {
         }
     }
 
-    protected final void recordTransferIn(
-            BigDecimal amount,
-            String sourceAccount) {
-
-        recordTransaction(
-                new Transaction(
-                        Transaction.Type.TRANSFER_IN,
-                        amount,
-                        sourceAccount,
-                        getAccountNumber()
-                )
-        );
-    }
-
-    public final void logTransferIn(
-            BigDecimal amount,
-            String sourceAccount) {
-
-        recordTransferIn(amount, sourceAccount);
-    }
-
-    protected final void recordTransferOut(
-            BigDecimal amount,
-            String targetAccount) {
-
-        recordTransaction(
-                new Transaction(
-                        Transaction.Type.TRANSFER_OUT,
-                        amount,
-                        getAccountNumber(),
-                        targetAccount
-                )
-        );
-    }
-
-    public final void logTransferOut(
-            BigDecimal amount,
-            String targetAccount) {
-
-        recordTransferOut(amount, targetAccount);
-    }
 
     protected final void creditBalance(BigDecimal amount) {
         validateAmount(amount);
