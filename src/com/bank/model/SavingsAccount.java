@@ -50,4 +50,30 @@ public class SavingsAccount extends Account {
         );
     }
 
+    @Override
+    public void sendTransfer(BigDecimal amount, String targetAccount)
+            throws InsufficientBalanceException {
+
+        validateAmount(amount);
+
+        BigDecimal projectedBalance = balance.subtract(amount);
+
+        if (projectedBalance.compareTo(minimumBalance) < 0) {
+            throw new InsufficientBalanceException(
+                    "Transfer violates minimum balance requirement"
+            );
+        }
+
+        debitBalance(amount);
+
+        recordTransaction(
+                new Transaction(
+                        Transaction.Type.TRANSFER_OUT,
+                        amount,
+                        getAccountNumber(),
+                        targetAccount
+                )
+        );
+    }
+
 }

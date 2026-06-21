@@ -52,4 +52,31 @@ public class CurrentAccount extends Account {
         );
     }
 
+    @Override
+    public void sendTransfer(BigDecimal amount, String targetAccount)
+            throws InsufficientBalanceException {
+
+        validateAmount(amount);
+
+        BigDecimal projectedBalance = balance.subtract(amount);
+        BigDecimal negativeLimit = overdraftLimit.negate();
+
+        if (projectedBalance.compareTo(negativeLimit) < 0) {
+            throw new InsufficientBalanceException(
+                    "Overdraft limit exceeded for transfer"
+            );
+        }
+
+        debitBalance(amount);
+
+        recordTransaction(
+                new Transaction(
+                        Transaction.Type.TRANSFER_OUT,
+                        amount,
+                        getAccountNumber(),
+                        targetAccount
+                )
+        );
+    }
+
 }
